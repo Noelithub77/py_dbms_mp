@@ -30,87 +30,61 @@ st.set_page_config(
 st.title("Food delivery Management System")
 st.markdown("---")
 
+if 'db_connected' not in st.session_state:
+    st.session_state.db_connected = False
+
 with st.sidebar:
-    st.header("Database Configuration")
-    
-    if 'db_config' not in st.session_state:
-        st.session_state.db_config = {
-            'host': 'dbms-mysql-dbmslab.e.aivencloud.com',
-            'user': 'avnadmin',
-            'password': 'AVNS_eHpHclo73k4_4xp285J',
-            'database': 'food_delivery(mp)',
-            'port': 26098
-        }
-    
-    if 'db' not in st.session_state:
-        st.session_state.db = None
-    
-    host = st.text_input("Host", value=st.session_state.db_config['host'])
-    user = st.text_input("User", value=st.session_state.db_config['user'])
-    password = st.text_input("Password", type="password", value=st.session_state.db_config['password'])
-    database = st.text_input("Database", value=st.session_state.db_config['database'])
-    port = st.number_input("Port", value=st.session_state.db_config['port'], min_value=1, max_value=65535)
-    
-    connect_btn = st.button("Connect to Database", type="primary")
-    
-    if connect_btn:
-        st.session_state.db_config = {
-            'host': host,
-            'user': user,
-            'password': password,
-            'database': database,
-            'port': port
-        }
+    if not st.session_state.db_connected:
+        st.header("Database Configuration")
         
-        try:
-            db = DatabaseConnection(host, user, password, database, port)
-            with db.get_connection() as conn:
-                pass
-            st.session_state.db = db
-            st.success("Connected to database!")
-        except Exception as e:
-            st.error(f"Connection failed: {str(e)}")
-    
-    st.markdown("---")
-    
-    if st.session_state.db:
+        if 'db_config' not in st.session_state:
+            st.session_state.db_config = {
+                'host': 'dbms-mysql-dbmslab.e.aivencloud.com',
+                'user': 'avnadmin',
+                'password': 'AVNS_eHpHclo73k4_4xp285J',
+                'database': 'food_delivery(mp)',
+                'port': 26098
+            }
+        
+        if 'db' not in st.session_state:
+            st.session_state.db = None
+        
+        host = st.text_input("Host", value=st.session_state.db_config['host'])
+        user = st.text_input("User", value=st.session_state.db_config['user'])
+        password = st.text_input("Password", type="password", value=st.session_state.db_config['password'])
+        database = st.text_input("Database", value=st.session_state.db_config['database'])
+        port = st.number_input("Port", value=st.session_state.db_config['port'], min_value=1, max_value=65535)
+        
+        connect_btn = st.button("Connect to Database", type="primary")
+        
+        if connect_btn:
+            st.session_state.db_config = {
+                'host': host,
+                'user': user,
+                'password': password,
+                'database': database,
+                'port': port
+            }
+            
+            try:
+                db = DatabaseConnection(host, user, password, database, port)
+                with db.get_connection() as conn:
+                    pass
+                st.session_state.db = db
+                st.session_state.db_connected = True
+                st.success("Connected to database!")
+                st.rerun()
+            except Exception as e:
+                st.error(f"Connection failed: {str(e)}")
+    else:
         st.success("Database Connected")
         
-        st.header("Navigation")
-        page = st.radio(
-            "Select Entity",
-            ["Admin", "Restaurant", "Food", "Customer", "Payment", "Order"],
-            label_visibility="collapsed"
-        )
-    else:
-        st.warning("Not Connected")
-        page = None
+        if st.button("Logout"):
+            st.session_state.db = None
+            st.session_state.db_connected = False
+            st.rerun()
 
-if st.session_state.db:
-    db = st.session_state.db
-    
-    admin_ops = AdminOperations(db)
-    restaurant_ops = RestaurantOperations(db)
-    food_ops = FoodOperations(db)
-    customer_ops = CustomerOperations(db)
-    payment_ops = PaymentOperations(db)
-    order_ops = OrderOperations(db)
-    
-    if page == "Admin":
-        render_admin_crud(admin_ops)
-    elif page == "Restaurant":
-        render_restaurant_crud(restaurant_ops, admin_ops)
-    elif page == "Food":
-        render_food_crud(food_ops, admin_ops)
-    elif page == "Customer":
-        render_customer_crud(customer_ops)
-    elif page == "Payment":
-        render_payment_crud(payment_ops, customer_ops)
-    elif page == "Order":
-        render_order_crud(order_ops, customer_ops, restaurant_ops, payment_ops, food_ops)
-else:
-    st.info("connect to the database")
-    
+if not st.session_state.db_connected:
     st.markdown("""
     ## System Overview
     
@@ -148,3 +122,37 @@ else:
     - Data integrity with foreign keys
     - Intuitive UI for managing restaurant operations
     """)
+else:
+    main_col, nav_col = st.columns([4, 1])
+    
+    with nav_col:
+        st.header("Navigation")
+        page = st.radio(
+            "Select Entity",
+            ["Admin", "Restaurant", "Food", "Customer", "Payment", "Order"],
+            label_visibility="collapsed"
+        )
+    
+    with main_col:
+        if st.session_state.db:
+            db = st.session_state.db
+            
+            admin_ops = AdminOperations(db)
+            restaurant_ops = RestaurantOperations(db)
+            food_ops = FoodOperations(db)
+            customer_ops = CustomerOperations(db)
+            payment_ops = PaymentOperations(db)
+            order_ops = OrderOperations(db)
+            
+            if page == "Admin":
+                render_admin_crud(admin_ops)
+            elif page == "Restaurant":
+                render_restaurant_crud(restaurant_ops, admin_ops)
+            elif page == "Food":
+                render_food_crud(food_ops, admin_ops)
+            elif page == "Customer":
+                render_customer_crud(customer_ops)
+            elif page == "Payment":
+                render_payment_crud(payment_ops, customer_ops)
+            elif page == "Order":
+                render_order_crud(order_ops, customer_ops, restaurant_ops, payment_ops, food_ops)
