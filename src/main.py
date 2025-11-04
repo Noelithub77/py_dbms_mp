@@ -1,5 +1,6 @@
 import streamlit as st
 import sys
+import os
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent))
@@ -41,7 +42,7 @@ with st.sidebar:
             st.session_state.db_config = {
                 'host': 'dbms-mysql-dbmslab.e.aivencloud.com',
                 'user': 'avnadmin',
-                'password': 'AVNS_eHpHclo73k4_4xp285J',
+                'password': os.getenv('DB_PASSWORD', ''),
                 'database': 'food_delivery(mp)',
                 'port': 26098
             }
