@@ -23,11 +23,11 @@ from ui.crud_components import (
 )
 
 st.set_page_config(
-    page_title="Restaurant Management System",
+    page_title="Food delivery Management System",
     layout="wide"
 )
 
-st.title("Restaurant Management System")
+st.title("Food delivery Management System")
 st.markdown("---")
 
 with st.sidebar:
@@ -35,10 +35,11 @@ with st.sidebar:
     
     if 'db_config' not in st.session_state:
         st.session_state.db_config = {
-            'host': 'localhost',
-            'user': 'root',
-            'password': '',
-            'database': 'restaurant_db'
+            'host': 'dbms-mysql-dbmslab.e.aivencloud.com',
+            'user': 'avnadmin',
+            'password': 'AVNS_eHpHclo73k4_4xp285J',
+            'database': 'food_delivery(mp)',
+            'port': 26098
         }
     
     if 'db' not in st.session_state:
@@ -48,6 +49,7 @@ with st.sidebar:
     user = st.text_input("User", value=st.session_state.db_config['user'])
     password = st.text_input("Password", type="password", value=st.session_state.db_config['password'])
     database = st.text_input("Database", value=st.session_state.db_config['database'])
+    port = st.number_input("Port", value=st.session_state.db_config['port'], min_value=1, max_value=65535)
     
     connect_btn = st.button("Connect to Database", type="primary")
     
@@ -56,11 +58,12 @@ with st.sidebar:
             'host': host,
             'user': user,
             'password': password,
-            'database': database
+            'database': database,
+            'port': port
         }
         
         try:
-            db = DatabaseConnection(host, user, password, database)
+            db = DatabaseConnection(host, user, password, database, port)
             with db.get_connection() as conn:
                 pass
             st.session_state.db = db
@@ -106,7 +109,7 @@ if st.session_state.db:
     elif page == "Order":
         render_order_crud(order_ops, customer_ops, restaurant_ops, payment_ops, food_ops)
 else:
-    st.info("Please configure and connect to the database using the sidebar")
+    st.info("connect to the database")
     
     st.markdown("""
     ## System Overview

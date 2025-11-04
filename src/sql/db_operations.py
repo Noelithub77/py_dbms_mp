@@ -1,19 +1,25 @@
-import mysql.connector
+import pymysql
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
 
 class DatabaseConnection:
-    def __init__(self, host: str, user: str, password: str, database: str):
+    def __init__(self, host: str, user: str, password: str, database: str, port: int = 3306):
         self.config = {
+            'charset': 'utf8mb4',
+            'connect_timeout': 10,
+            'cursorclass': pymysql.cursors.DictCursor,
+            'db': database,
             'host': host,
-            'user': user,
             'password': password,
-            'database': database
+            'read_timeout': 10,
+            'port': port,
+            'user': user,
+            'write_timeout': 10
         }
     
     @contextmanager
     def get_connection(self):
-        conn = mysql.connector.connect(**self.config)
+        conn = pymysql.connect(**self.config)
         try:
             yield conn
         finally:
@@ -21,7 +27,7 @@ class DatabaseConnection:
     
     def execute_query(self, query: str, params: tuple = None, fetch: bool = False):
         with self.get_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
+            cursor = conn.cursor()
             cursor.execute(query, params or ())
             if fetch:
                 result = cursor.fetchall()
