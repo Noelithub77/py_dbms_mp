@@ -1,0 +1,10 @@
+[project]
+name = "py-dbms-mp"
+version = "0.1.0"
+description = "Restaurant Management System with Streamlit UI and MySQL backend"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "streamlit>=1.39.0",
+    "mysql-connector-python>=9.1.0",
+]
