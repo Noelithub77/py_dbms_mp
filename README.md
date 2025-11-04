@@ -1,4 +1,4 @@
-# Restaurant Management System
+# Fodd delivery Management System
 
 A complete CRUD application built with Streamlit and MySQL that demonstrates all entity relationships from an ER diagram including 1:1, 1:N, and N:N relationships.
 
@@ -36,22 +36,10 @@ A complete CRUD application built with Streamlit and MySQL that demonstrates all
 uv sync
 ```
 
-### 2. Setup MySQL Database
-
-Ensure MySQL server is running, then execute the schema:
+### 2. Run Application
 
 ```bash
-mysql -u root -p < src/sql/schema.sql
-```
-
-Or import manually:
-1. Open MySQL client
-2. Run the contents of `src/sql/schema.sql`
-
-### 3. Run Application
-
-```bash
-uv run streamlit run src/app.py
+uv run streamlit run src/main.py
 ```
 
 ## Usage
@@ -63,7 +51,7 @@ uv run streamlit run src/app.py
    - Host (default: localhost)
    - User (default: root)
    - Password
-   - Database (default: restaurant_db)
+   - Database (default: food_delivery(mp))
 3. Click "Connect to Database"
 
 ### CRUD Operations
@@ -112,4 +100,4 @@ The schema includes:
 - **Backend**: MySQL
 - **Python**: 3.12+
 - **Package Manager**: uv
-- **Database Driver**: mysql-connector-python
+- **Database Driver**: pymysql
