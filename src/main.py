@@ -33,17 +33,32 @@ st.markdown("---")
 with st.sidebar:
     st.header("Database Configuration")
     
-    host = st.text_input("Host", value="localhost")
-    user = st.text_input("User", value="root")
-    password = st.text_input("Password", type="password", value="")
-    database = st.text_input("Database", value="restaurant_db")
-    
-    connect_btn = st.button("Connect to Database", type="primary")
+    if 'db_config' not in st.session_state:
+        st.session_state.db_config = {
+            'host': 'localhost',
+            'user': 'root',
+            'password': '',
+            'database': 'restaurant_db'
+        }
     
     if 'db' not in st.session_state:
         st.session_state.db = None
     
+    host = st.text_input("Host", value=st.session_state.db_config['host'])
+    user = st.text_input("User", value=st.session_state.db_config['user'])
+    password = st.text_input("Password", type="password", value=st.session_state.db_config['password'])
+    database = st.text_input("Database", value=st.session_state.db_config['database'])
+    
+    connect_btn = st.button("Connect to Database", type="primary")
+    
     if connect_btn:
+        st.session_state.db_config = {
+            'host': host,
+            'user': user,
+            'password': password,
+            'database': database
+        }
+        
         try:
             db = DatabaseConnection(host, user, password, database)
             with db.get_connection() as conn:
